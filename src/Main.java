@@ -1,11 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 public class Main extends JFrame {
-
     Main ()
     {
         init();
@@ -16,18 +12,31 @@ public class Main extends JFrame {
         setTitle("Space Survival");
         setSize(1366,768);
         setLocationRelativeTo(null);
-        setResizable(false);//*
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Game game=new Game();
-        add(game);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                game.start();
-            }
-        });
-    }
 
+        CardLayout cardLayout = new CardLayout();
+        JPanel container = new JPanel(cardLayout);
+
+        Game gamePanel = new Game();
+        gamePanel.setFocusable(true);
+
+        WelcomePanel welcomePanel = new WelcomePanel(
+                e -> {
+                    cardLayout.show(container, "game");
+                    gamePanel.start();
+                    gamePanel.requestFocus();
+                },
+                e -> System.exit(0)
+        );
+
+        container.add(welcomePanel, "welcome");
+        container.add(gamePanel, "game");
+
+        cardLayout.show(container, "welcome");
+
+        setContentPane(container);
+    }
 
     public static void main(String[] args) {
         Main main=new Main();
