@@ -1,4 +1,5 @@
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Game extends Component {
+public class Game extends JPanel {
     private Graphics2D g2d;
     private BufferedImage image;
     private int width;
@@ -20,28 +21,27 @@ public class Game extends Component {
     private final int Target_Time = 1000000000 / FPS;
     private Player player;
     private Key key;
-    private List<Bullet>bulletList;
-    private List<Alien>alienList;
+    private List<Bullet> bulletList;
+    private List<Alien> alienList;
     private int shotTime;
     private int score = 0;
 
     public void start() {
         width = getWidth();
         height = getHeight();
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        g2d=image.createGraphics();
+        image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        g2d = image.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         Thread thread = new Thread(() -> {
             while (run) {
-                long startTime=System.nanoTime();
+                long startTime = System.nanoTime();
                 drawBackground();
                 drawGame();
                 Render();
-                long time=System.nanoTime()-startTime;
-                if(time<Target_Time)
-                {
-                    long s=(Target_Time-time)/1000000;
+                long time = System.nanoTime() - startTime;
+                if (time < Target_Time) {
+                    long s = (Target_Time - time) / 1000000;
                     sleep(s);
                 }
 
@@ -53,10 +53,9 @@ public class Game extends Component {
         thread.start();
     }
 
-    private void initGame()
-    {
-        player=new Player();
-        player.changLocation(150,150);
+    private void initGame() {
+        player = new Player();
+        player.changLocation(150, 150);
         alienList = Collections.synchronizedList(new ArrayList<>());
         new Thread(() -> {
             while (run) {
@@ -66,26 +65,24 @@ public class Game extends Component {
         }).start();
     }
 
-    public void addAlien()
-    {
-        Random random=new Random();
-        int y1=random.nextInt(height-50)+25;
-        Alien alien=new Alien();
-        alien.changLocation(0,y1);
+    public void addAlien() {
+        Random random = new Random();
+        int y1 = random.nextInt(height - 50) + 25;
+        Alien alien = new Alien();
+        alien.changLocation(0, y1);
         alien.changeAngle(0);
         alienList.add(alien);
 
-        int y2=random.nextInt(height-50)+25;
-        Alien alien2=new Alien();
-        alien2.changLocation(width,y2);
+        int y2 = random.nextInt(height - 50) + 25;
+        Alien alien2 = new Alien();
+        alien2.changLocation(width, y2);
         alien2.changeAngle(180);
         alienList.add(alien2);
     }
 
-    private void drawBackground()
-    {
+    private void drawBackground() {
         try {
-            BufferedImage backgroundImage =ImageIO.read(new File("src\\space\\s.jpg"));
+            BufferedImage backgroundImage = ImageIO.read(new File("src\\space\\s.jpg"));
             g2d.drawImage(backgroundImage, 0, 0, width, height, null);
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,7 +92,6 @@ public class Game extends Component {
         //g2d.dispose();
     }
 
-
     private void resetGame() {
         score = 0;
         alienList.clear();
@@ -104,62 +100,44 @@ public class Game extends Component {
         player.reset();
     }
 
-    private void initKeyboard()
-    {
-        key=new Key();
+    private void initKeyboard() {
+        key = new Key();
         requestFocus();
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_LEFT)
-                {
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     key.setKey_left(true);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-                {
+                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     key.setKey_right(true);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_SPACE)
-                {
+                } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     key.setKey_space(true);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_J)
-                {
+                } else if (e.getKeyCode() == KeyEvent.VK_J) {
                     key.setKey_j(true);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     key.setKey_enter(true);
                 }
             }
 
             @Override
-            public void keyReleased(KeyEvent e)
-            {
-                if (e.getKeyCode() == KeyEvent.VK_LEFT)
-                {
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     key.setKey_left(false);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-                {
+                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     key.setKey_right(false);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_SPACE)
-                {
+                } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     key.setKey_space(false);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_J)
-                {
+                } else if (e.getKeyCode() == KeyEvent.VK_J) {
                     key.setKey_j(false);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     key.setKey_enter(false);
                 }
             }
         });
         new Thread(() -> {
-            float s=0.5f;
+            float s = 0.5f;
             while (run) {
-                if(player.isAlive()) {
+                if (player.isAlive()) {
                     float angle = player.getAngle();
                     if (key.isKey_left()) {
                         angle -= s;
@@ -187,8 +165,7 @@ public class Game extends Component {
                     }
                     player.updata();
                     player.changeAngle(angle);
-                }
-                else {
+                } else {
                     if (key.isKey_enter()) {
                         resetGame();
                     }
@@ -201,9 +178,8 @@ public class Game extends Component {
                             alien.updata();
                             if (!alien.check(width, height)) {
                                 iterator.remove();
-                            }
-                            else {
-                                if (player.isAlive()){
+                            } else {
+                                if (player.isAlive()) {
                                     checkPlayer(alien);
                                 }
                             }
@@ -227,7 +203,7 @@ public class Game extends Component {
                         bulletList.remove(bullet);
                     }
                 }
-                        sleep(1);
+                sleep(1);
             }
         }).start();
     }
@@ -251,15 +227,11 @@ public class Game extends Component {
         }
     }
 
-    private void checkPlayer(Alien alien)
-    {
-        if(alien !=null)
-        {
+    private void checkPlayer(Alien alien) {
+        if (alien != null) {
             Rectangle2D PlayerBounds = player.getBounds();
-            if (PlayerBounds.intersects(alien.getBounds()))
-            {
-                if (! player.updateHP(0.1))
-                {
+            if (PlayerBounds.intersects(alien.getBounds())) {
+                if (!player.updateHP(0.1)) {
                     player.setAlive(false);
                 }
             }
@@ -267,25 +239,20 @@ public class Game extends Component {
         }
     }
 
-    private void drawGame()
-    {
-        if(player.isAlive()) {
+    private void drawGame() {
+        if (player.isAlive()) {
             player.draw(g2d);
         }
-        for (int i=0;i<bulletList.size();i++)
-        {
-            Bullet bullet=bulletList.get(i);
-            if (bullet != null)
-            {
+        for (int i = 0; i < bulletList.size(); i++) {
+            Bullet bullet = bulletList.get(i);
+            if (bullet != null) {
                 bullet.draw(g2d);
             }
         }
 
-        for (int i=0;i<alienList.size();i++)
-        {
-            Alien alien=alienList.get(i);
-            if (alien != null)
-            {
+        for (int i = 0; i < alienList.size(); i++) {
+            Alien alien = alienList.get(i);
+            if (alien != null) {
                 alien.draw(g2d);
             }
         }
@@ -314,15 +281,17 @@ public class Game extends Component {
         }
     }
 
-    private void Render()
-    {
-        Graphics g=getGraphics();
-        g.drawImage(image,0,0,null);
-        g.dispose();
+    private void Render() {
+        repaint();
     }
 
-    private void sleep(long t)
-    {
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, null);
+    }
+
+    private void sleep(long t) {
         try {
             Thread.sleep(t);
         } catch (InterruptedException e) {
